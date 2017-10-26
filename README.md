@@ -19,25 +19,7 @@ A Container image can be created specifically to perform some reverse proxy task
     1.  http://download.microsoft.com/download/E/9/8/E9849D6A-020E-47E4-9FD0-A023E99B54EB/requestRouter_amd64.msi
     1.  http://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990D8BCA9/rewrite_amd64.msi
 
-1.  Build a Docker image using the following Dockerfile:
-    ```
-    FROM    microsoft/iis
-     
-    RUN     mkdir c:\temp
-     
-    COPY    requestRouter_amd64.msi c:/temp/
-    COPY    rewrite_amd64.msi c:/temp/
-     
-     
-    RUN     msiexec.exe /i "c:\temp\requestRouter_amd64.msi" /qn
-    RUN     msiexec.exe /i "c:\temp\rewrite_amd64.msi" /qn
-     
-    RUN     powershell -NoProfile -Command \
-            Remove-Item c:\temp -Recurse -Force
-     
-    RUN     powershell -NoProfile -Command \
-            Set-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Name 'enabled' -Filter 'system.webServer/proxy' -Value 'True'
-    ```
+1.  Build a Docker image using the following the Dockerfile in the repository
 
 ## Using IIS reverse proxy Docker Image
 Once the image is build according to the previous section, a container with IIS Reverse Proxy can be started using the command (assuming that the image created is call `iis-proxy`):
