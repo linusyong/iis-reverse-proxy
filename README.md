@@ -70,7 +70,7 @@ In this example, we will use the reverse proxy of IIS to rewrite all content fro
     ```
     It is also possible to use powershell to generate the configuration rather than creating web.config file (replace the `COPY    web.config 'C:\inetpub\wwwroot\'` line with the following):
     ```
-    RUN	  powershell -NoProfile -Command \
+    RUN   powershell -NoProfile -Command \
             Start-Job -Name AddWebConfig -ScriptBlock { \
               Add-WebConfigurationProperty -pspath 'iis:\sites\Default' -filter 'system.webServer/rewrite/rules' -name '.' -value @{name='Proxy';stopProcessing='True'}; \
             }; \
