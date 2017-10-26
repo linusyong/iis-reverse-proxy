@@ -68,10 +68,22 @@ In this example, we will use the reverse proxy of IIS to rewrite all content fro
       </system.webServer>
     </configuration>
     ```
+    It is also possible to use powershell to generate the configuration rather than creating web.config file (replace the `COPY    web.config 'C:\inetpub\wwwroot\'` line with the following):
+    ```
+    RUN	  powershell -NoProfile -Command \
+            Start-Job -Name AddWebConfig -ScriptBlock { \
+              Add-WebConfigurationProperty -pspath 'iis:\sites\Default' -filter 'system.webServer/rewrite/rules' -name '.' -value @{name='Proxy';stopProcessing='True'}; \
+            }; \
+            Wait-Job -Name AddWebConfig; \
+          Set-WebConfigurationProperty -pspath 'iis:\sites\Default' -filter 'system.webServer/rewrite/rules/rule/match' -name 'url' -value '^^hello/(.*)'; \
+          Set-WebConfigurationProperty -pspath 'iis:\sites\Default' -filter 'system.webServer/rewrite/rules/rule/action' -name 'type' -value 'Rewrite'; \
+          Set-WebConfigurationProperty -pspath 'iis:\sites\Default' -filter 'system.webServer/rewrite/rules/rule/action' -name 'url' -value 'http://localhost:8080/{R:1}'
+
+    ``` 
 
 1.  Build the image using the command `docker build -t hello-world-proxy .` in the directory that contain both files and run it using the command:
     ```
     docker run -it -d -p 80:80 -p 8080:8080 --name hello-world --rm hello-world-proxy
     ```
 
-1.  Accessing the URL http://<server>/hello/ should display "Hello World" which is proxied from http://<server>:8080/.
+1.  Accessing the URL http://&lt;server&gt;/hello/ should display "Hello World" which is proxied from http://&lt;server&gt;:8080/.
